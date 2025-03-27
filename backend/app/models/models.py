@@ -21,16 +21,14 @@ class User(Base):
     u_created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    weddings_groom = relationship("Wedding", foreign_keys="[Wedding.w_groom_id]", back_populates="groom")
-    weddings_bride = relationship("Wedding", foreign_keys="[Wedding.w_bride_id]", back_populates="bride")
+    weddings_fiance = relationship("Wedding", foreign_keys="[Wedding.w_fiance_id]", back_populates="fiance")
     images = relationship("Image", back_populates="user")
 
 class Wedding(Base):
     __tablename__ = "weddings"
 
     id = Column(Integer, primary_key=True, index=True)
-    w_groom_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
-    w_bride_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    w_fiance_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     w_date = Column(Date, nullable=False)
     w_location = Column(String(255), nullable=False)
     w_description = Column(Text)
@@ -38,8 +36,7 @@ class Wedding(Base):
     w_created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    groom = relationship("User", foreign_keys=[w_groom_id], back_populates="weddings_groom")
-    bride = relationship("User", foreign_keys=[w_bride_id], back_populates="weddings_bride")
+    fiance = relationship("User", foreign_keys=[w_fiance_id], back_populates="weddings_fiance")
     guests = relationship("Guest", back_populates="wedding")
     guest_groups = relationship("GuestGroup", back_populates="wedding")
     reminders = relationship("Reminder", back_populates="wedding")

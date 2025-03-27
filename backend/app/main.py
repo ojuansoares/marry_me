@@ -51,7 +51,6 @@ def startup_event():
         commands = [cmd.strip() for cmd in init_sql.split(';') if cmd.strip()]
         for command in commands:
             if command:
-                print(f"Executing SQL: {command}")
                 try:
                     conn.execute(text(command))
                 except Exception as e:
@@ -62,8 +61,8 @@ def startup_event():
     with engine.connect() as conn:
         conn.execute(text("SET search_path TO public"))
         try:
-            Base.metadata.drop_all(engine)
-            Base.metadata.create_all(engine)
+            Base.metadata.drop_all(bind=engine)
+            Base.metadata.create_all(bind=engine)
             
             result = conn.execute(text("""
                 SELECT table_name 

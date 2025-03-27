@@ -2,50 +2,51 @@
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from typing import Optional
 from app.schemas.user import User, UserCreate, UserUpdate
 from app.models.models import User as UserModel
 from app.core.security import get_password_hash
 
 
 class CreateUserController:
-    def __init__(self, db: Session, user: UserCreate) -> None:
-        self._db = db
+    def __init__(self, session: Session, user: UserCreate) -> None:
+        self._session = session
         self._user = user
 
-    def execute(self) -> None:
+    def execute(self) -> User:
         try:
-            db_user = GetUserByEmailController.execute(self._db, email=self._user.email)
+            db_user = GetUserByEmailController.execute(self._session, u_email=self._user.u_email)
             if db_user:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Email already registered"
                 )
-            self.create_user()
+            user = self.create_user()
+            self._session.commit()
+            return user
         except Exception as e:
+            self._session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e)
             )
 
-    def create_user(self) -> None:
-        hashed_password = get_password_hash(self._user.password)
+    def create_user(self) -> User:
+        hashed_password = get_password_hash(self._user.u_password)
         db_user = UserModel(
-            u_name=self._user.name,
-            u_email=self._user.email,
+            u_name=self._user.u_name,
+            u_email=self._user.u_email,
             u_password_hash=hashed_password,
-            u_phone=self._user.phone,
-            u_type=self._user.type
+            u_phone=self._user.u_phone,
+            u_type=self._user.u_type
         )
-        self._db.add(db_user)
-        self._db.commit()
-        self._db.refresh(db_user)
+        self._session.add(db_user)
+        return db_user
 
 
 class GetUserController:
     @staticmethod
-    def execute(db: Session, user_id: int) -> User:
-        db_user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    def execute(session: Session, user_id: int) -> UserModel:
+        db_user = session.query(UserModel).filter(UserModel.id == user_id).first()
         if db_user is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -55,13 +56,13 @@ class GetUserController:
 
 class GetUserByEmailController:
     @staticmethod
-    def execute(db: Session, email: str) -> Optional[User]:
-        return db.query(UserModel).filter(UserModel.u_email == email).first()
+    def execute(session: Session, u_email: str) -> UserModel | None:
+        return session.query(UserModel).filter(UserModel.u_email == u_email).first()
 
 class UpdateUserController:
     @staticmethod
-    def execute(db: Session, user_id: int, user: UserUpdate) -> User:
-        db_user = GetUserController.execute(db, user_id=user_id)
+    def execute(session: Session, user_id: int, user: UserUpdate) -> UserModel:
+        db_user = GetUserController.execute(session, user_id=user_id)
         
         update_data = user.model_dump(exclude_unset=True)
         if "password" in update_data:
@@ -70,13 +71,13 @@ class UpdateUserController:
         for field, value in update_data.items():
             setattr(db_user, f"u_{field}", value)
             
-        db.commit()
-        db.refresh(db_user)
+        session.commit()
+        session.refresh(db_user)
         return db_user
 
 class DeleteUserController:
     @staticmethod
-    def execute(db: Session, user_id: int) -> None:
-        db_user = GetUserController.execute(db, user_id=user_id)
-        db.delete(db_user)
-        db.commit()
+    def execute(session: Session, user_id: int) -> None:
+        db_user = GetUserController.execute(session, user_id=user_id)
+        session.delete(db_user)
+        session.commit()
