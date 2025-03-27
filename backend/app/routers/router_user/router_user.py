@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.schemas.user import User, UserCreate, UserUpdate
-from app.models.models import Usuario
+from app.models.models import User as UserModel
 from app.core.security import get_password_hash
 
 
@@ -29,13 +29,13 @@ class CreateUserController:
             )
 
     def create_user(self) -> None:
-        hashed_password = get_password_hash(self._user.senha)
-        db_user = Usuario(
-            nome=self._user.nome,
-            email=self._user.email,
-            senha_hash=hashed_password,
-            telefone=self._user.telefone,
-            tipo=self._user.tipo
+        hashed_password = get_password_hash(self._user.password)
+        db_user = UserModel(
+            u_name=self._user.name,
+            u_email=self._user.email,
+            u_password_hash=hashed_password,
+            u_phone=self._user.phone,
+            u_type=self._user.type
         )
         self._db.add(db_user)
         self._db.commit()
@@ -45,7 +45,7 @@ class CreateUserController:
 class GetUserController:
     @staticmethod
     def execute(db: Session, user_id: int) -> User:
-        db_user = db.query(Usuario).filter(Usuario.id == user_id).first()
+        db_user = db.query(UserModel).filter(UserModel.id == user_id).first()
         if db_user is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -56,7 +56,7 @@ class GetUserController:
 class GetUserByEmailController:
     @staticmethod
     def execute(db: Session, email: str) -> Optional[User]:
-        return db.query(Usuario).filter(Usuario.email == email).first()
+        return db.query(UserModel).filter(UserModel.u_email == email).first()
 
 class UpdateUserController:
     @staticmethod
@@ -64,11 +64,11 @@ class UpdateUserController:
         db_user = GetUserController.execute(db, user_id=user_id)
         
         update_data = user.model_dump(exclude_unset=True)
-        if "senha" in update_data:
-            update_data["senha"] = get_password_hash(update_data["senha"])
+        if "password" in update_data:
+            update_data["password"] = get_password_hash(update_data["password"])
             
         for field, value in update_data.items():
-            setattr(db_user, field, value)
+            setattr(db_user, f"u_{field}", value)
             
         db.commit()
         db.refresh(db_user)

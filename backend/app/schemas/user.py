@@ -1,25 +1,25 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, Literal
+from typing import Literal
 from datetime import datetime
 
 class UserBase(BaseModel):
-    nome: str
-    email: EmailStr
-    telefone: str
-    tipo: Literal['noivo', 'convidado']
+    u_name: str
+    u_email: EmailStr
+    u_phone: str
+    u_type: Literal['fiance', 'guest']
 
 class UserCreate(UserBase):
-    senha: str
+    u_password: str
 
 class UserUpdate(BaseModel):
-    nome: str | None = None
-    email: EmailStr | None = None
-    telefone: str | None = None
-    senha: str | None = None
+    u_name: str | None = None
+    u_email: EmailStr | None = None
+    u_phone: str | None = None
+    u_password: str | None = None
 
 class UserInDBBase(UserBase):
     id: int
-    created_at: datetime
+    u_created_at: datetime
 
     class Config:
         from_attributes = True
@@ -28,4 +28,4 @@ class User(UserInDBBase):
     pass
 
 class UserInDB(UserInDBBase):
-    senha_hash: str 
+    u_password_hash: str 

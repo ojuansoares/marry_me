@@ -5,116 +5,116 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 # Create ENUM types
-usertype = ENUM('noivo', 'convidado', name='usertype', create_type=False)
-weddingstatus = ENUM('ativo', 'adiado', 'cancelado', name='weddingstatus', create_type=False)
-phototype = ENUM('noivos', 'convidados', name='phototype', create_type=False)
+usertype = ENUM('fiance', 'guest', name='usertype', create_type=False)
+weddingstatus = ENUM('active', 'postponed', 'cancelled', name='weddingstatus', create_type=False)
+phototype = ENUM('couple', 'guests', name='phototype', create_type=False)
 
-class Usuario(Base):
-    __tablename__ = "usuarios"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nome = Column(String(100), nullable=False)
-    email = Column(String(100), unique=True, nullable=False)
-    senha_hash = Column(Text, nullable=False)
-    telefone = Column(String(20))
-    tipo = Column(usertype, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-    # Relationships
-    casamentos_noivo = relationship("Casamento", foreign_keys="[Casamento.noivo_id]", back_populates="noivo")
-    casamentos_noiva = relationship("Casamento", foreign_keys="[Casamento.noiva_id]", back_populates="noiva")
-    fotos = relationship("Foto", back_populates="usuario")
-
-class Casamento(Base):
-    __tablename__ = "casamentos"
+class User(Base):
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    noivo_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"))
-    noiva_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"))
-    data = Column(Date, nullable=False)
-    local = Column(String(255), nullable=False)
-    descricao = Column(Text)
-    status = Column(weddingstatus, default='ativo')
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    u_name = Column(String(100), nullable=False)
+    u_email = Column(String(100), unique=True, nullable=False)
+    u_password_hash = Column(Text, nullable=False)
+    u_phone = Column(String(20))
+    u_type = Column(usertype, nullable=False)
+    u_created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    noivo = relationship("Usuario", foreign_keys=[noivo_id], back_populates="casamentos_noivo")
-    noiva = relationship("Usuario", foreign_keys=[noiva_id], back_populates="casamentos_noiva")
-    convidados = relationship("Convidado", back_populates="casamento")
-    grupos = relationship("GrupoConvidados", back_populates="casamento")
-    lembretes = relationship("Lembrete", back_populates="casamento")
-    fotos = relationship("Foto", back_populates="casamento")
-    orcamentos = relationship("Orcamento", back_populates="casamento")
+    weddings_groom = relationship("Wedding", foreign_keys="[Wedding.w_groom_id]", back_populates="groom")
+    weddings_bride = relationship("Wedding", foreign_keys="[Wedding.w_bride_id]", back_populates="bride")
+    images = relationship("Image", back_populates="user")
 
-class GrupoConvidados(Base):
-    __tablename__ = "grupos_convidados"
+class Wedding(Base):
+    __tablename__ = "weddings"
 
     id = Column(Integer, primary_key=True, index=True)
-    casamento_id = Column(Integer, ForeignKey("casamentos.id", ondelete="CASCADE"))
-    nome_grupo = Column(String(100), nullable=False)
-    responsavel_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"))
-    confirmado = Column(Boolean, default=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    w_groom_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    w_bride_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    w_date = Column(Date, nullable=False)
+    w_location = Column(String(255), nullable=False)
+    w_description = Column(Text)
+    w_status = Column(weddingstatus, default='active')
+    w_created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    casamento = relationship("Casamento", back_populates="grupos")
-    convidados = relationship("Convidado", back_populates="grupo")
-    responsavel = relationship("Usuario")
+    groom = relationship("User", foreign_keys=[w_groom_id], back_populates="weddings_groom")
+    bride = relationship("User", foreign_keys=[w_bride_id], back_populates="weddings_bride")
+    guests = relationship("Guest", back_populates="wedding")
+    guest_groups = relationship("GuestGroup", back_populates="wedding")
+    reminders = relationship("Reminder", back_populates="wedding")
+    images = relationship("Image", back_populates="wedding")
+    budgets = relationship("Budget", back_populates="wedding")
 
-class Convidado(Base):
-    __tablename__ = "convidados"
+class GuestGroup(Base):
+    __tablename__ = "guest_groups"
 
     id = Column(Integer, primary_key=True, index=True)
-    casamento_id = Column(Integer, ForeignKey("casamentos.id", ondelete="CASCADE"))
-    usuario_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), nullable=True)
-    grupo_id = Column(Integer, ForeignKey("grupos_convidados.id", ondelete="CASCADE"), nullable=True)
-    nome = Column(String(100), nullable=False)
-    telefone = Column(String(20))
-    email = Column(String(100))
-    qr_code = Column(String(255), unique=True)
-    confirmado = Column(Boolean, default=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    gg_wedding_id = Column(Integer, ForeignKey("weddings.id", ondelete="CASCADE"))
+    gg_name = Column(String(100), nullable=False)
+    gg_responsible_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    gg_confirmed = Column(Boolean, default=False)
+    gg_created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    casamento = relationship("Casamento", back_populates="convidados")
-    usuario = relationship("Usuario")
-    grupo = relationship("GrupoConvidados", back_populates="convidados")
+    wedding = relationship("Wedding", back_populates="guest_groups")
+    guests = relationship("Guest", back_populates="guest_group")
+    responsible = relationship("User")
 
-class Lembrete(Base):
-    __tablename__ = "lembretes"
+class Guest(Base):
+    __tablename__ = "guests"
 
     id = Column(Integer, primary_key=True, index=True)
-    casamento_id = Column(Integer, ForeignKey("casamentos.id", ondelete="CASCADE"))
-    descricao = Column(Text, nullable=False)
-    data_hora = Column(DateTime, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    g_wedding_id = Column(Integer, ForeignKey("weddings.id", ondelete="CASCADE"))
+    g_user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    g_group_id = Column(Integer, ForeignKey("guest_groups.id", ondelete="CASCADE"), nullable=True)
+    g_name = Column(String(100), nullable=False)
+    g_phone = Column(String(20))
+    g_email = Column(String(100))
+    g_qr_code = Column(String(255), unique=True)
+    g_confirmed = Column(Boolean, default=False)
+    g_created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    casamento = relationship("Casamento", back_populates="lembretes")
+    wedding = relationship("Wedding", back_populates="guests")
+    user = relationship("User")
+    guest_group = relationship("GuestGroup", back_populates="guests")
 
-class Foto(Base):
-    __tablename__ = "fotos"
+class Reminder(Base):
+    __tablename__ = "reminders"
 
     id = Column(Integer, primary_key=True, index=True)
-    casamento_id = Column(Integer, ForeignKey("casamentos.id", ondelete="CASCADE"))
-    usuario_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"))
-    url_foto = Column(Text, nullable=False)
-    tipo = Column(phototype, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    r_wedding_id = Column(Integer, ForeignKey("weddings.id", ondelete="CASCADE"))
+    r_description = Column(Text, nullable=False)
+    r_datetime = Column(DateTime, nullable=False)
+    r_created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    casamento = relationship("Casamento", back_populates="fotos")
-    usuario = relationship("Usuario", back_populates="fotos")
+    wedding = relationship("Wedding", back_populates="reminders")
 
-class Orcamento(Base):
-    __tablename__ = "orcamento"
+class Image(Base):
+    __tablename__ = "images"
 
     id = Column(Integer, primary_key=True, index=True)
-    casamento_id = Column(Integer, ForeignKey("casamentos.id", ondelete="CASCADE"))
-    descricao = Column(String(255), nullable=False)
-    valor = Column(DECIMAL(10, 2), nullable=False)
-    pago = Column(Boolean, default=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    i_wedding_id = Column(Integer, ForeignKey("weddings.id", ondelete="CASCADE"))
+    i_user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    i_url = Column(Text, nullable=False)
+    i_type = Column(phototype, nullable=False)
+    i_created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    casamento = relationship("Casamento", back_populates="orcamentos") 
+    wedding = relationship("Wedding", back_populates="images")
+    user = relationship("User", back_populates="images")
+
+class Budget(Base):
+    __tablename__ = "budgets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    b_wedding_id = Column(Integer, ForeignKey("weddings.id", ondelete="CASCADE"))
+    b_description = Column(String(255), nullable=False)
+    b_value = Column(DECIMAL(10, 2), nullable=False)
+    b_paid = Column(Boolean, default=False)
+    b_created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    wedding = relationship("Wedding", back_populates="budgets") 
