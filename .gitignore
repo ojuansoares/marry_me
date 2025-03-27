@@ -64,4 +64,47 @@ media/
 uploads/
 
 # Static files
-static/ 
+static/
+
+# React Native / Expo
+frontend/node_modules/
+frontend/.expo/
+frontend/dist/
+frontend/npm-debug.*
+frontend/yarn-debug.*
+frontend/yarn-error.*
+frontend/.env
+frontend/.env.*
+
+# iOS
+frontend/ios/Pods/
+frontend/ios/build/
+frontend/ios/Podfile.lock
+frontend/ios/*.xcworkspace
+frontend/ios/*.xcuserstate
+frontend/ios/project.xcworkspace/
+frontend/ios/xcuserdata/
+frontend/ios/.xcode.env.local
+
+# Android
+frontend/android/app/build/
+frontend/android/build/
+frontend/android/gradle/
+frontend/android/gradlew
+frontend/android/gradlew.bat
+frontend/android/local.properties
+frontend/android/.gradle/
+frontend/android/captures/
+frontend/android/app/release/
+
+# Metro
+frontend/.metro-health-check*
+
+# TypeScript
+frontend/*.tsbuildinfo
+frontend/.tscache/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/ 

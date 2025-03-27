@@ -88,3 +88,24 @@ Frontend (Em breve):
 - React Navigation
 - Axios
 - AsyncStorage 
+
+Para rodar o projeto, você pode usar:
+
+```bash
+npx expo start
+```
+
+Isso vai iniciar o servidor de desenvolvimento do Expo e mostrar um QR code. Você tem algumas opções para rodar o app:
+
+1. **No celular físico**:
+   - Instale o aplicativo "Expo Go" no seu celular (disponível na Play Store ou App Store)
+   - Escaneie o QR code que aparece no terminal com o app Expo Go
+   - O app vai carregar automaticamente no seu celular
+
+2. **No emulador Android**:
+   - Tenha o Android Studio instalado com um emulador configurado
+   - Pressione 'a' no terminal onde o Expo está rodando para abrir no emulador Android
+
+3. **No simulador iOS** (apenas para usuários Mac):
+   - Tenha o Xcode instalado
+   - Pressione 'i' no terminal onde o Expo está rodando para abrir no simulador iOS 
