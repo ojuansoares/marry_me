@@ -10,6 +10,7 @@ from app.routers.router_user.router_user import (
     UpdateUserController,
     DeleteUserController
 )
+from app.core.security import get_current_user
 
 router = APIRouter(
     prefix="/users",
@@ -19,9 +20,9 @@ router = APIRouter(
 def get_router():
     return router
 
-@router.post("/", response_model=User, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=User)
 def create_user(
-    user: UserCreate, 
+    user: UserCreate,
     session: Session = Depends(get_db)
 ):
     return CreateUserController(session=session, user=user).execute()

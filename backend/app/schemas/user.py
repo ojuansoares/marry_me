@@ -29,13 +29,13 @@ class UserInDBBase(UserBase):
     id: int
     u_created_at: datetime
 
-    class Config:
-        from_attributes = True
-
-# Para dados de saída (completo)
-# Quando o cliente recebe todos os dados de um usuário
+# Para dados de saída
+# Quando o cliente recebe dados de um usuário
 class User(UserInDBBase):
     pass
+
+    class Config:
+        from_attributes = True
 
 # Para dados de saída (privados)
 # Quando o cliente recebe dados de um usuário (sem senha)
