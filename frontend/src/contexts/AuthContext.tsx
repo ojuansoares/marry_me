@@ -1,45 +1,47 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import authService from '../services/authService';
 
 interface AuthContextType {
     isAuthenticated: boolean;
     userType: string | null;
-    login: (username: string, password: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
-    loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+    isAuthenticated: false,
+    userType: null,
+    login: async () => {},
+    logout: async () => {},
+});
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userType, setUserType] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        checkAuthStatus();
+        checkAuth();
     }, []);
 
-    const checkAuthStatus = async () => {
+    const checkAuth = async () => {
         try {
             const isAuth = await authService.isAuthenticated();
             if (isAuth) {
                 const userData = await authService.getCurrentUser();
+                setIsAuthenticated(true);
                 setUserType(userData.user_type);
             }
-            setIsAuthenticated(isAuth);
         } catch (error) {
-            console.error('Error checking auth status:', error);
-        } finally {
-            setLoading(false);
+            console.error('Error checking auth:', error);
         }
     };
 
-    const login = async (username: string, password: string) => {
+    const login = async (email: string, password: string) => {
         try {
-            const response = await authService.login({ username, password });
-            setUserType(response.user_type);
+            const response = await authService.login({ username: email, password });
             setIsAuthenticated(true);
+            setUserType(response.user_type);
         } catch (error) {
             throw error;
         }
@@ -56,16 +58,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, userType, login, logout, loading }}>
+        <AuthContext.Provider value={{ isAuthenticated, userType, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
-};
+}
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-}; 
+export function useAuth() {
+    return useContext(AuthContext);
+} 

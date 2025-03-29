@@ -109,3 +109,4 @@ frontend/.tscache/
 *.tmp
 *.temp
 .cache/ 
+node_modules

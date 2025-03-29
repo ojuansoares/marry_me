@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Use seu IP local aqui
-const API_URL = 'http://127.0.0.1:8000';  // Substitua pelo seu IP
+const API_URL = 'http://192.168.3.18:8000';  // IP correto da sua máquina
 
 export interface LoginCredentials {
     username: string;
@@ -17,12 +17,13 @@ export interface AuthResponse {
 
 class AuthService {
     async login(credentials: LoginCredentials): Promise<AuthResponse> {
-        const formData = new FormData();
-        formData.append('username', credentials.username);
-        formData.append('password', credentials.password);
-
         try {
-            const response = await axios.post(`${API_URL}/auth/login`, formData);
+            const response = await axios.post(`${API_URL}/auth/login`, credentials, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                }
+            });
             if (response.data.access_token) {
                 await AsyncStorage.setItem('token', response.data.access_token);
                 await AsyncStorage.setItem('user', JSON.stringify(response.data));
@@ -30,6 +31,12 @@ class AuthService {
             return response.data;
         } catch (error) {
             console.error('Login error:', error);
+            if (axios.isAxiosError(error)) {
+                console.error('Response data:', error.response?.data);
+                console.error('Response status:', error.response?.status);
+                console.error('Response headers:', error.response?.headers);
+                throw new Error(error.response?.data?.detail || 'Erro ao fazer login');
+            }
             throw error;
         }
     }

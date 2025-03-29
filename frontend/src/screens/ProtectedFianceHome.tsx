@@ -15,13 +15,12 @@ export default function ProtectedFianceHome() {
             return;
         }
 
-        if (userType && userType !== 'fiance') {
-            alert('Você não tem permissão para acessar esta tela.');
+        if (userType !== 'fiance') {
             navigation.navigate('Login');
         }
     }, [isAuthenticated, userType, navigation]);
 
-    if (!isAuthenticated || (userType && userType !== 'fiance')) {
+    if (!isAuthenticated || userType !== 'fiance') {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Text>Carregando...</Text>

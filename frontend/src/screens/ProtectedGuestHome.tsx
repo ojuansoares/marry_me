@@ -15,13 +15,12 @@ export default function ProtectedGuestHome() {
             return;
         }
 
-        if (userType && userType !== 'guest') {
-            alert('Você não tem permissão para acessar esta tela.');
+        if (userType !== 'guest') {
             navigation.navigate('Login');
         }
     }, [isAuthenticated, userType, navigation]);
 
-    if (!isAuthenticated || (userType && userType !== 'guest')) {
+    if (!isAuthenticated || userType !== 'guest') {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Text>Carregando...</Text>

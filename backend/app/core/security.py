@@ -68,4 +68,43 @@ async def get_current_user(
     user = get_user_by_email(db, email)
     if user is None:
         raise credentials_exception
-    return user 
+    return user
+
+def verify_user_type(token: str = Depends(oauth2_scheme), required_type: str = None) -> bool:
+    """
+    Verify if the user has the required type from the JWT token.
+    
+    Args:
+        token: JWT token
+        required_type: Required user type to verify
+        
+    Returns:
+        True if user type matches, False otherwise
+    """
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        user_type = payload.get("user_type")
+        if user_type is None:
+            return False
+        return user_type == required_type
+    except JWTError:
+        return False
+
+def require_user_type(required_type: str):
+    """
+    Dependency function to require a specific user type.
+    
+    Args:
+        required_type: Required user type
+        
+    Returns:
+        Dependency function that raises HTTPException if user type doesn't match
+    """
+    async def dependency(token: str = Depends(oauth2_scheme)) -> bool:
+        if not verify_user_type(token, required_type):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"User type {required_type} required"
+            )
+        return True
+    return dependency 
