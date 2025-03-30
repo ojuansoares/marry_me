@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -45,4 +45,13 @@ def login(
         "access_token": access_token,
         "token_type": "bearer",
         "user_type": user.u_type
+    }
+
+@router.get("/test")
+def test_connection():
+    print("Test endpoint called!")  # Log no console do backend
+    return {
+        "status": "ok", 
+        "message": "Backend is running!",
+        "timestamp": datetime.now().isoformat()
     }

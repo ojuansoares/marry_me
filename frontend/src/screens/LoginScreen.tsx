@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
+import authService from '../services/authService';
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
@@ -16,10 +17,33 @@ export default function LoginScreen() {
 
         try {
             setLoading(true);
+            console.log('Iniciando login...');
             await login(email, password);
+            console.log('Login realizado com sucesso');
         } catch (error) {
             console.error('Login error:', error);
-            Alert.alert('Erro', error instanceof Error ? error.message : 'Erro ao fazer login');
+            Alert.alert(
+                'Erro de Login',
+                error instanceof Error ? error.message : 'Erro ao fazer login. Verifique sua conexão com a internet.'
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const testConnection = async () => {
+        try {
+            setLoading(true);
+            const isConnected = await authService.testConnection();
+            Alert.alert(
+                'Teste de Conexão',
+                isConnected 
+                    ? 'Conexão com o backend estabelecida com sucesso!'
+                    : 'Não foi possível conectar ao backend. Verifique se o servidor está rodando.'
+            );
+        } catch (error) {
+            console.error('Test connection error:', error);
+            Alert.alert('Erro', 'Erro ao testar conexão');
         } finally {
             setLoading(false);
         }
@@ -51,6 +75,15 @@ export default function LoginScreen() {
             >
                 <Text style={styles.buttonText}>
                     {loading ? 'Entrando...' : 'Entrar'}
+                </Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+                style={[styles.button, styles.testButton, loading && styles.buttonDisabled]} 
+                onPress={testConnection}
+                disabled={loading}
+            >
+                <Text style={styles.buttonText}>
+                    Testar Conexão
                 </Text>
             </TouchableOpacity>
         </View>
@@ -89,5 +122,9 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    testButton: {
+        backgroundColor: '#4CAF50',
+        marginTop: 10,
     },
 }); 
