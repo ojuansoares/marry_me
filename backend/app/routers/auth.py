@@ -36,7 +36,8 @@ def login(
         data={
             "sub": user.u_email,
             "user_id": user.id,
-            "user_type": user.u_type
+            "user_type": user.u_type,
+            "user_email": user.u_email
         },
         expires_delta=access_token_expires
     )
@@ -44,7 +45,8 @@ def login(
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user_type": user.u_type
+        "user_type": user.u_type,
+        "user_email": user.u_email
     }
 
 @router.get("/test")

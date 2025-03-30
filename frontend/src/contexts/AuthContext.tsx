@@ -5,6 +5,7 @@ import authService from '../services/authService';
 interface AuthContextType {
     isAuthenticated: boolean;
     userType: string | null;
+    userEmail: string | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
 }
@@ -12,6 +13,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
     isAuthenticated: false,
     userType: null,
+    userEmail: null,
     login: async () => {},
     logout: async () => {},
 });
@@ -19,6 +21,7 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userType, setUserType] = useState<string | null>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
 
     useEffect(() => {
         checkAuth();
@@ -31,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const userData = await authService.getCurrentUser();
                 setIsAuthenticated(true);
                 setUserType(userData.user_type);
+                setUserEmail(userData.user_email);
             }
         } catch (error) {
             console.error('Error checking auth:', error);
@@ -42,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const response = await authService.login({ username: email, password });
             setIsAuthenticated(true);
             setUserType(response.user_type);
+            setUserEmail(response.user_email);
         } catch (error) {
             throw error;
         }
@@ -58,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, userType, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, userType, userEmail, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
