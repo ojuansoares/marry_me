@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authService from '../services/authService';
+import { Alert } from 'react-native';
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -8,6 +9,7 @@ interface AuthContextType {
     userEmail: string | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    createUser: (userData: { name: string; email: string; password: string; userType: string }) => Promise<void>; // Adicionando a função
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -16,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
     userEmail: null,
     login: async () => {},
     logout: async () => {},
+    createUser: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -62,8 +65,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const createUser = async (userData: { name: string; email: string; password: string; userType: string }) => {
+        try {
+            await authService.createUser(userData); // Chame a função de criação de usuário do authService
+            Alert.alert('Sucesso', 'Conta criada com sucesso!');
+        } catch (error) {
+            throw error;
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, userType, userEmail, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, userType, userEmail, login, logout, createUser }}>
             {children}
         </AuthContext.Provider>
     );

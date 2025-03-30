@@ -16,6 +16,13 @@ export interface AuthResponse {
     user_email: string;
 }
 
+export interface UserCreate {
+    name: string;
+    email: string;
+    password: string;
+    userType: string; // 'fiance' ou 'guest'
+}
+
 class AuthService {
     async login(credentials: LoginCredentials): Promise<AuthResponse> {
         try {
@@ -51,6 +58,15 @@ class AuthService {
                 }
                 throw new Error(error.response?.data?.detail || 'Erro ao fazer login');
             }
+            throw error;
+        }
+    }
+
+    async createUser(userData: UserCreate): Promise<void> {
+        try {
+            await axios.post(`${API_URL}/users/`, userData); // Endpoint para criar usuário
+        } catch (error) {
+            console.error('Error creating user:', error);
             throw error;
         }
     }
