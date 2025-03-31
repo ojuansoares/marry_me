@@ -109,3 +109,76 @@ Isso vai iniciar o servidor de desenvolvimento do Expo e mostrar um QR code. Voc
 3. **No simulador iOS** (apenas para usuários Mac):
    - Tenha o Xcode instalado
    - Pressione 'i' no terminal onde o Expo está rodando para abrir no simulador iOS 
+
+---
+
+## Product Backlog
+
+| ID  | Item |
+|-----|------|
+| 1   | Criar conta e configurar perfil do casamento |
+| 2   | Criar e personalizar lista de convidados |
+| 3   | Categorizar convidados por tipo (familiares, amigos, colegas, etc.) |
+| 4   | Gerar QR code único para cada convidado |
+| 5   | Compartilhar informações do evento com convidados |
+| 6   | Criar galeria de fotos para os convidados deixarem mensagens |
+| 7   | Criar e gerenciar lista de presentes |
+| 8   | Acompanhar confirmações de presença e presentes reservados |
+| 9   | Criar funcionalidade de chat entre noivos e convidados |
+| 10  | Permitir atualização de informações do evento |
+| 11  | Integrar câmera do dispositivo para compartilhamento de fotos |
+| 12  | Adicionar contagem regressiva para o dia do casamento |
+| 13  | Criar funcionalidade para upload de fotos dos convidados |
+| 14  | Criar lembretes para prazos importantes |
+| 15  | Criar planilha de orçamento e alertas de gastos |
+| 16  | Integrar GPS para localização do evento |
+| 17  | Criar notificações personalizadas |
+| 18  | Exibir estatísticas sobre a interação dos convidados |
+| 19  | Criar seção para visualizar fotos enviadas pelos convidados |
+| 20  | Enviar mensagens de agradecimento personalizadas após o evento |
+
+---
+
+## Sprint Backlog
+
+### SPRINT 1:
+
+| ID  | Item |
+|-----|------|
+| 1   | Criar conta e configurar perfil do casamento |
+| 2   | Criar e personalizar lista de convidados |
+| 3   | Criar categoria de convidados |
+| 5   | Compartilhar informações do evento com convidados |
+| 6   | Criar galeria de fotos com mensagens |
+| 7   | Criar e gerenciar lista de presentes |
+| 8   | Acompanhar confirmações de presença e presentes reservados |
+| 10  | Permitir atualização de informações do evento |
+
+### SPRINT 2:
+
+| ID  | Item |
+|-----|------|
+| 12  | Criar funcionalidade de contagem regressiva |
+| 18  | Exibir estatísticas de interação dos convidados |
+| 21  | Gerar planilha com presença e detalhes dos convidados |
+| 14  | Criar lembretes para prazos importantes |
+| 16  | Integrar GPS para localização do evento |
+| 17  | Criar notificações personalizadas |
+
+### SPRINT 3:
+
+| ID  | Item |
+|-----|------|
+| 15  | Criar planilha de orçamento com alertas de gastos |
+| 9   | Criar funcionalidade de chat entre noivos e convidados |
+| 20  | Enviar mensagens de agradecimento personalizadas |
+| 11  | Integrar câmera para compartilhamento de fotos |
+| 4   | Gerar QR code para registro de presença |
+| 13  | Criar funcionalidade para upload de fotos dos convidados |
+| 19  | Criar seção para visualizar fotos dos convidados |
+
+## Modelo Entidade-Relacionamento (MER)
+
+Abaixo está o diagrama MER representando a estrutura do banco de dados:
+
+![Diagrama MER](docs/mer.png)
