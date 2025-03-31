@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Use seu IP local aqui
-const API_URL = 'http://192.168.3.18:8000';  // Substitua pelo seu IP local
+const API_URL = 'http://192.168.137.146:8000';  // Substitua pelo seu IP local
 
 export interface LoginCredentials {
     username: string;
@@ -17,10 +17,11 @@ export interface AuthResponse {
 }
 
 export interface UserCreate {
-    name: string;
-    email: string;
-    password: string;
-    userType: string; // 'fiance' ou 'guest'
+    u_name: string;
+    u_email: string;
+    u_phone: string;
+    u_type: string; // 'fiance' ou 'guest'
+    u_password: string;
 }
 
 class AuthService {
@@ -64,6 +65,7 @@ class AuthService {
 
     async createUser(userData: UserCreate): Promise<void> {
         try {
+            console.log('Creating user with data:', userData);
             await axios.post(`${API_URL}/users/`, userData); // Endpoint para criar usuário
         } catch (error) {
             console.error('Error creating user:', error);

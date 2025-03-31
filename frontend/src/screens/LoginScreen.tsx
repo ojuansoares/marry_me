@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Button } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import authService from '../services/authService';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }: { navigation: any }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -86,6 +86,10 @@ export default function LoginScreen() {
                     Testar Conexão
                 </Text>
             </TouchableOpacity>
+            <Button
+                title="Voltar"
+                onPress={() => navigation.navigate('ChooseAccountType')}
+            />
         </View>
     );
 }

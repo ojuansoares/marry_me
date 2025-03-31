@@ -9,7 +9,7 @@ interface AuthContextType {
     userEmail: string | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
-    createUser: (userData: { name: string; email: string; password: string; userType: string }) => Promise<void>; // Adicionando a função
+    createUser: (userData: { u_name: string; u_email: string; u_phone: string; u_type: string;u_password: string;}) => Promise<void>; // Adicionando a função
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const createUser = async (userData: { name: string; email: string; password: string; userType: string }) => {
+    const createUser = async (userData: { u_name: string; u_email: string; u_phone: string; u_type: string;u_password: string;}) => {
         try {
             await authService.createUser(userData); // Chame a função de criação de usuário do authService
             Alert.alert('Sucesso', 'Conta criada com sucesso!');

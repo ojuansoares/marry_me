@@ -4,24 +4,35 @@ import LoginScreen from './src/screens/LoginScreen';
 import ProtectedFianceHome from './src/screens/ProtectedFianceHome';
 import ProtectedGuestHome from './src/screens/ProtectedGuestHome';
 import { useAuth } from './src/contexts/AuthContext';
-import { createStackNavigator } from '@react-navigation/stack';
 import ChooseAccountTypeScreen from './src/screens/ChooseAccountType';
 import CreateAccountScreen from './src/screens/CreateAccount';
 import { NavigationContainer } from '@react-navigation/native';
-
-const Stack = createStackNavigator();
+import { View } from 'react-native';
 
 function AppContent() {
     const { isAuthenticated, userType } = useAuth();
+    const [currentScreen, setCurrentScreen] = React.useState('ChooseAccountType');
+
+    const navigateTo = (screen: string) => {
+        setCurrentScreen(screen);
+    };
 
     if (!isAuthenticated) {
-        return (
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="ChooseAccount" component={ChooseAccountTypeScreen} />
-                <Stack.Screen name="Login" component={LoginScreen} />
-                <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
-            </Stack.Navigator>
-        );
+        if (currentScreen === 'ChooseAccountType') {
+            return (
+                <ChooseAccountTypeScreen navigation={{ navigate: navigateTo }} />
+            );
+        }
+        if (currentScreen === 'Login') {
+            return (
+                <LoginScreen navigation={{ navigate: navigateTo }} />
+            );
+        }
+        if (currentScreen === 'CreateAccount') {
+            return (
+                <CreateAccountScreen navigation={{ navigate: navigateTo }} />
+            );
+        }
     }
 
     if (userType === 'fiance') {
@@ -31,7 +42,7 @@ function AppContent() {
         return <ProtectedGuestHome />;
     }
 
-    return <LoginScreen />;
+    return <LoginScreen navigation={{navigate: navigateTo}} />; 
 }
 
 export default function App() {

@@ -48,13 +48,19 @@ class CreateUserController:
 class GetUserController:
     @staticmethod
     def execute(session: Session, user_id: int) -> User:
-        db_user = session.query(UserModel).filter(UserModel.id == user_id).first()
-        if not db_user:
+        try:
+            db_user = session.query(UserModel).filter(UserModel.id == user_id).first()
+            if not db_user:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User not found"
+                )
+            return User.from_orm(db_user)
+        except Exception as e:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
             )
-        return User.from_orm(db_user)
 
 class GetUserByEmailController:
     @staticmethod
@@ -64,32 +70,46 @@ class GetUserByEmailController:
 class UpdateUserController:
     @staticmethod
     def execute(session: Session, user_id: int, user: UserUpdate) -> User:
-        db_user = session.query(UserModel).filter(UserModel.id == user_id).first()
-        if not db_user:
-            raise HTTPException(
+        try:
+            db_user = session.query(UserModel).filter(UserModel.id == user_id).first()
+            if not db_user:
+                raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found"
             )
-        
-        update_data = user.dict(exclude_unset=True)
-        if "u_password" in update_data:
-            update_data["u_password_hash"] = get_password_hash(update_data.pop("u_password"))
-        
-        for field, value in update_data.items():
-            setattr(db_user, field, value)
-        
-        session.commit()
-        session.refresh(db_user)
-        return User.from_orm(db_user)
+            update_data = user.dict(exclude_unset=True)
+            if "u_password" in update_data:
+                update_data["u_password_hash"] = get_password_hash(update_data.pop("u_password"))
+
+            for field, value in update_data.items():
+                setattr(db_user, field, value)
+
+            session.commit()
+            session.refresh(db_user)
+            return User.from_orm(db_user)
+        except Exception as e:
+            session.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
+
 
 class DeleteUserController:
     @staticmethod
     def execute(session: Session, user_id: int) -> None:
-        db_user = session.query(UserModel).filter(UserModel.id == user_id).first()
-        if not db_user:
+        try:
+            db_user = session.query(UserModel).filter(UserModel.id == user_id).first()
+            if not db_user:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User not found"
+                )
+            session.delete(db_user)
+            session.commit()
+        except Exception as e:
+            session.rollback()
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
             )
-        session.delete(db_user)
-        session.commit()
