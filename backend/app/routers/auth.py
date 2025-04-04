@@ -35,9 +35,9 @@ def login(
     access_token = create_access_token(
         data={
             "sub": user.u_email,
-            "user_id": user.id,
             "user_type": user.u_type,
-            "user_email": user.u_email
+            "user_email": user.u_email,
+            "user_id": user.id
         },
         expires_delta=access_token_expires
     )
@@ -46,7 +46,8 @@ def login(
         "access_token": access_token,
         "token_type": "bearer",
         "user_type": user.u_type,
-        "user_email": user.u_email
+        "user_email": user.u_email,
+        "user_id": user.id
     }
 
 @router.get("/test")

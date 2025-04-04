@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Use seu IP local aqui
-const API_URL = 'http://192.168.137.146:8000';  // Substitua pelo seu IP local
+const API_URL = 'http://192.168.3.11:8000';  // Substitua pelo seu IP local
 
 export interface LoginCredentials {
     username: string;
@@ -14,6 +14,7 @@ export interface AuthResponse {
     token_type: string;
     user_type: string;
     user_email: string;
+    user_id: number;
 }
 
 export interface UserCreate {

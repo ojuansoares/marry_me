@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function GuestHomeScreen() {
+export default function GuestHomeScreen({ navigation }: { navigation: any }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo Convidado!</Text>

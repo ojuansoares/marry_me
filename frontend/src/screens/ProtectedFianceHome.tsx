@@ -3,7 +3,9 @@ import { View, Text } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import FianceHomeScreen from './FianceHomeScreen';
 import Header from '../components/Header';
-export default function ProtectedFianceHome() {
+import { WeddingProvider } from '../contexts/WeddingContext';
+
+export default function ProtectedFianceHome({ navigation }: { navigation: any }) {
     const { isAuthenticated, userType } = useAuth();
 
     if (!isAuthenticated || userType !== 'fiance') {
@@ -14,10 +16,16 @@ export default function ProtectedFianceHome() {
         );
     }
 
+    const navigateTo = (screen: string) => {
+        navigation.navigate(screen);
+    };
+
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ flex: 1 }}>
             <Header />
-            <FianceHomeScreen />
+            <WeddingProvider>
+                <FianceHomeScreen navigation={{ navigate: navigateTo }} />
+            </WeddingProvider>
         </View>
     );
-} 
+}

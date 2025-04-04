@@ -47,15 +47,17 @@ class GetWeddingController:
             raise HTTPException(status_code=404, detail="Wedding not found")
         return Wedding.from_orm(wedding)
 
-class GetWeddingsByFianceController:
+class GetWeddingByFianceController:
     def __init__(self, session: Session, fiance_id: int):
         self.db = session
         self.fiance_id = fiance_id
-        self.db_weddings: list[WeddingModel] | None = None
+        self.db_wedding: WeddingModel | None = None
 
-    def execute(self) -> list[Wedding]:
-        self.db_weddings = self.db.query(WeddingModel).filter(WeddingModel.w_fiance_id == self.fiance_id).all()
-        return [Wedding.from_orm(wedding) for wedding in self.db_weddings]  
+    def execute(self) -> Wedding:
+        self.db_wedding = self.db.query(WeddingModel).filter(WeddingModel.w_fiance_id == self.fiance_id).first()
+        if not self.db_wedding:
+            raise HTTPException(status_code=404, detail="Wedding not found")
+        return Wedding.from_orm(self.db_wedding)  
 
 
 class UpdateWeddingController:
@@ -88,9 +90,10 @@ class UpdateWeddingController:
             )
 
 class DeleteWeddingController:
-    def __init__(self, session: Session, wedding_id: int):
+    def __init__(self, session: Session, wedding_id: int, current_user: User):
         self.db = session
         self.wedding_id = wedding_id
+        self.current_user = current_user
 
     def execute(self) -> None:
         try:
@@ -99,6 +102,11 @@ class DeleteWeddingController:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Wedding not found"
+                )
+            if db_wedding.w_fiance_id != self.current_user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="You are not allowed to delete this wedding"
                 )
             self.db.delete(db_wedding)
             self.db.commit()

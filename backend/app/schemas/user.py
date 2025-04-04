@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Literal
 from datetime import datetime
 
@@ -14,6 +14,12 @@ class UserBase(BaseModel):
 # Quando o cliente envia dados para criar um usuário
 class UserCreate(UserBase):
     u_password: str
+
+    @field_validator('u_type')
+    def validate_u_type(cls, u_type):
+        if u_type not in ['fiance', 'guest']:
+            raise ValueError('Invalid user type')
+        return u_type
 
 # Para dados de atualização
 # Quando o cliente envia dados para atualizar um usuário

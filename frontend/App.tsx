@@ -7,7 +7,8 @@ import { useAuth } from './src/contexts/AuthContext';
 import ChooseAccountTypeScreen from './src/screens/ChooseAccountType';
 import CreateAccountScreen from './src/screens/CreateAccount';
 import { NavigationContainer } from '@react-navigation/native';
-import { View } from 'react-native';
+import WeddingDetails from './src/screens/WeddingDetails';
+import CreateWeddingScreen from './src/screens/CreateWeddingScreen';
 
 function AppContent() {
     const { isAuthenticated, userType } = useAuth();
@@ -35,11 +36,20 @@ function AppContent() {
         }
     }
 
+    if (currentScreen === 'FianceHomeScreen') {
+        return <ProtectedFianceHome navigation={{ navigate: navigateTo }} />;
+    }
+    if (currentScreen === 'WeddingDetails') {
+        return <WeddingDetails navigation={{ navigate: navigateTo }} />;
+    }
+    if (currentScreen === 'CreateWeddingScreen') {
+        return <CreateWeddingScreen navigation={{ navigate: navigateTo }} />;
+    }
     if (userType === 'fiance') {
-        return <ProtectedFianceHome />;
+        return <ProtectedFianceHome navigation={{navigate: navigateTo}} />;
     }
     if (userType === 'guest') {
-        return <ProtectedGuestHome />;
+        return <ProtectedGuestHome navigation={{navigate: navigateTo}} />;
     }
 
     return <LoginScreen navigation={{navigate: navigateTo}} />; 

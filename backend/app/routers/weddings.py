@@ -8,7 +8,7 @@ from app.schemas.wedding import Wedding, WeddingCreate, WeddingUpdate
 from app.models.models import User
 from app.routers.router_wedding.router_wedding import (
     CreateWeddingController,
-    GetWeddingsByFianceController,
+    GetWeddingByFianceController,
     GetWeddingController,
     UpdateWeddingController,
     DeleteWeddingController
@@ -40,14 +40,14 @@ def get_wedding(
 ):
     return GetWeddingController(session=session, wedding_id=wedding_id).execute()
 
-@router.get("/fiance/{fiance_id}", response_model=list[Wedding])
-def get_weddings_by_fiance(
+@router.get("/fiance/{fiance_id}", response_model=Wedding)
+def get_wedding_by_fiance(
     fiance_id: int,
     session: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
     _: bool = Depends(require_user_type("fiance"))
 ):
-    return GetWeddingsByFianceController(session=session, fiance_id=fiance_id).execute()
+    return GetWeddingByFianceController(session=session, fiance_id=fiance_id).execute()
 
 @router.put("/{wedding_id}", response_model=Wedding)
 def update_wedding(
@@ -66,4 +66,4 @@ def delete_wedding(
     current_user: User = Depends(get_current_user),
     _: bool = Depends(require_user_type("fiance"))
 ):
-    return DeleteWeddingController(session=session, wedding_id=wedding_id).execute()
+    return DeleteWeddingController(session=session, wedding_id=wedding_id, current_user=current_user).execute()

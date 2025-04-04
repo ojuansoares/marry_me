@@ -5,7 +5,7 @@ import GuestHomeScreen from './GuestHomeScreen';
 import Header from '../components/Header';
 
 
-export default function ProtectedGuestHome() {
+export default function ProtectedGuestHome({ navigation }: { navigation: any }) {
     const { isAuthenticated, userType } = useAuth();
 
     if (!isAuthenticated || userType !== 'guest') {
@@ -16,10 +16,14 @@ export default function ProtectedGuestHome() {
         );
     }
 
+    const navigateTo = (screen: string) => {
+        navigation.navigate(screen);
+    };
+
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Header />
-            <GuestHomeScreen />
+            <GuestHomeScreen navigation={{ navigate: navigateTo }} />
         </View>
     );
 } 

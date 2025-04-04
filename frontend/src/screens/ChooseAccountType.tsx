@@ -5,6 +5,7 @@ import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
 const ChooseAccountTypeScreen = ({ navigation }: { navigation: any }) => {
     return (
         <View style={styles.container}>
+            <Text style={styles.mainTitle}>Bem-vindo ao Marry Me</Text>
             <Text style={styles.title}>Escolha uma opção</Text>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CreateAccount')}>
@@ -25,8 +26,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        fontSize: 24,
+        fontSize: 17,
         marginBottom: 20,
+    },
+    mainTitle: {
+        fontSize: 25,
+        marginBottom: 20,
+        fontWeight: 'bold',
     },
     button: {
         backgroundColor: '#007AFF',
