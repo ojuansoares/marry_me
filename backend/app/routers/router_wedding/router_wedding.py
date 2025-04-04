@@ -14,8 +14,10 @@ class CreateWeddingController:
         try:
             if self.db.query(WeddingModel).filter(WeddingModel.w_fiance_id == self.current_user.id).first():
                 raise HTTPException(status_code=400, detail="User already has a wedding")
+            print(">> Tentando criar casamento para usuário ID:", self.current_user.id)
             self.create_wedding()
             self.db.commit()
+            print(">> Casamento criado com sucesso")
             return Wedding.from_orm(self.db_wedding)
         except Exception as e:
             self.db.rollback()

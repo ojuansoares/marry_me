@@ -9,6 +9,7 @@ import CreateAccountScreen from './src/screens/CreateAccount';
 import { NavigationContainer } from '@react-navigation/native';
 import WeddingDetails from './src/screens/WeddingDetails';
 import CreateWeddingScreen from './src/screens/CreateWeddingScreen';
+import { WeddingProvider } from './src/contexts/WeddingContext';
 
 function AppContent() {
     const { isAuthenticated, userType } = useAuth();
@@ -17,6 +18,25 @@ function AppContent() {
     const navigateTo = (screen: string) => {
         setCurrentScreen(screen);
     };
+
+    if (isAuthenticated && userType === 'fiance') {
+        return (
+            <WeddingProvider>
+                {currentScreen === 'FianceHomeScreen' && (
+                    <ProtectedFianceHome navigation={{ navigate: navigateTo }} />
+                )}
+                {currentScreen === 'WeddingDetails' && (
+                    <WeddingDetails navigation={{ navigate: navigateTo }} />
+                )}
+                {currentScreen === 'CreateWeddingScreen' && (
+                    <CreateWeddingScreen navigation={{ navigate: navigateTo }} />
+                )}
+                {['FianceHomeScreen', 'WeddingDetails', 'CreateWeddingScreen'].includes(currentScreen) === false && (
+                    <ProtectedFianceHome navigation={{ navigate: navigateTo }} />
+                )}
+            </WeddingProvider>
+        );
+    }
 
     if (!isAuthenticated) {
         if (currentScreen === 'ChooseAccountType') {
@@ -36,18 +56,6 @@ function AppContent() {
         }
     }
 
-    if (currentScreen === 'FianceHomeScreen') {
-        return <ProtectedFianceHome navigation={{ navigate: navigateTo }} />;
-    }
-    if (currentScreen === 'WeddingDetails') {
-        return <WeddingDetails navigation={{ navigate: navigateTo }} />;
-    }
-    if (currentScreen === 'CreateWeddingScreen') {
-        return <CreateWeddingScreen navigation={{ navigate: navigateTo }} />;
-    }
-    if (userType === 'fiance') {
-        return <ProtectedFianceHome navigation={{navigate: navigateTo}} />;
-    }
     if (userType === 'guest') {
         return <ProtectedGuestHome navigation={{navigate: navigateTo}} />;
     }

@@ -1,8 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '@env';
 
-// Use seu IP local aqui
-const API_URL = 'http://192.168.3.11:8000';  // Substitua pelo seu IP local
+const AUTH_URL = `${API_URL}/auth`;;  // Substitua pelo seu IP local
 
 export interface LoginCredentials {
     username: string;
@@ -28,13 +28,13 @@ export interface UserCreate {
 class AuthService {
     async login(credentials: LoginCredentials): Promise<AuthResponse> {
         try {
-            console.log('Attempting login to:', `${API_URL}/auth/login`);
+            console.log('Attempting login to:', `${AUTH_URL}/login`);
             // Criar FormData para enviar os dados no formato correto do OAuth2
             const formData = new URLSearchParams();
             formData.append('username', credentials.username);
             formData.append('password', credentials.password);
 
-            const response = await axios.post(`${API_URL}/auth/login`, formData, {
+            const response = await axios.post(`${AUTH_URL}/login`, formData, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'application/json',
@@ -99,7 +99,7 @@ class AuthService {
     async testConnection(): Promise<boolean> {
         try {
             console.log('Testing connection to:', `${API_URL}/auth/test`);
-            const response = await axios.get(`${API_URL}/auth/test`);
+            const response = await axios.get(`${AUTH_URL}/test`);
             console.log('Test response:', response.data);
             return true;
         } catch (error) {

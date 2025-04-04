@@ -6,8 +6,15 @@ import authService from '../services/authService';
 interface WeddingContextType {
     wedding: any;
     fetchWedding: () => Promise<void>;
-    createWedding: (weddingData: any) => Promise<void>;
+    createWedding: (weddingData: WeddingCreate) => Promise<any>;
     deleteWedding: () => Promise<void>;
+}
+
+export interface WeddingCreate {
+    w_date: string;
+    w_location: string;
+    w_description: string;
+    w_status: string;
 }
 
 const WeddingContext = createContext<WeddingContextType | undefined>(undefined);
@@ -36,12 +43,14 @@ export function WeddingProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const createWedding = async (weddingData: any) => {
+    const createWedding = async (weddingData: WeddingCreate) => {
         try {
-            await weddingService.createWedding(weddingData);
-            await fetchWedding();
+            const response = await weddingService.createWedding(weddingData);
+            setWedding(response);
+            console.log('Casamento criado com sucesso:', response);
         } catch (error) {
             console.error('Erro ao criar casamento:', error);
+            throw error;
         }
     };
 

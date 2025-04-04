@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const API_URL = 'http://192.168.230.139:8000/weddings'; // Substitua pelo seu IP local
+import { API_URL } from '@env';
+const WEDDING_URL = `${API_URL}/weddings`;
 
 export interface WeddingCreate {
     w_date: string;
@@ -11,17 +11,18 @@ export interface WeddingCreate {
 }
 
 class WeddingService {
-    async createWedding(weddingData: WeddingCreate): Promise<void> {
+    async createWedding(weddingData: WeddingCreate): Promise<any> {
         try {
             const token = await AsyncStorage.getItem('token');
             if (!token) throw new Error('Usuário não autenticado');
 
-            const response = await axios.post(`${API_URL}/`, weddingData, {
+            const response = await axios.post(`${WEDDING_URL}/`, weddingData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
+            console.log("Dados enviados:", weddingData);
             return response.data;
         } catch (error) {
             console.error('Erro ao criar casamento:', error);
@@ -34,7 +35,7 @@ class WeddingService {
             const token = await AsyncStorage.getItem('token');
             if (!token) throw new Error('Usuário não autenticado');
 
-            const response = await axios.get(`${API_URL}/fiance/${fianceId}`, {
+            const response = await axios.get(`${WEDDING_URL}/fiance/${fianceId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -48,7 +49,15 @@ class WeddingService {
 
     async deleteWedding(weddingId: number): Promise<void> {
         try {
-            await axios.delete(`${API_URL}/${weddingId}`);
+            const token = await AsyncStorage.getItem('token');
+            if (!token) throw new Error('Usuário não autenticado');
+
+            const response = axios.delete(`${WEDDING_URL}/${weddingId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return (await response).data;
         } catch (error) {
             console.error('Error deleting wedding:', error);
             throw error;

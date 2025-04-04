@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { useWedding } from '../contexts/WeddingContext';
+import { useWedding, WeddingCreate } from '../contexts/WeddingContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 
@@ -8,11 +8,11 @@ export default function CreateWeddingScreen({ navigation }: { navigation: any })
   const { createWedding } = useWedding();
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [weddingData, setWeddingData] = useState({
+  const [weddingData, setWeddingData] = useState<WeddingCreate>({
     w_date: format(new Date(), 'yyyy-MM-dd'),
     w_location: '',
     w_description: '',
-    w_status: 'Planejamento',
+    w_status: 'active',
   });
 
   const handleDateChange = (event: any, selectedDate: any) => {
@@ -33,9 +33,11 @@ export default function CreateWeddingScreen({ navigation }: { navigation: any })
       }
 
       await createWedding(weddingData);
+      console.log('Casamento:', weddingData);
       Alert.alert('Sucesso', 'Casamento criado com sucesso!');
-      navigation.goBack();
+      navigation.navigate('ProtectedFianceScreen');
     } catch (error) {
+      console.error('Erro ao criar casamento:', error);
       Alert.alert('Erro', 'Não foi possível criar o casamento. Tente novamente.');
     }
   };
@@ -95,7 +97,7 @@ export default function CreateWeddingScreen({ navigation }: { navigation: any })
         
         <TouchableOpacity 
           style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate('ProtectedFianceScreen')}
         >
           <Text style={styles.cancelButtonText}>Cancelar</Text>
         </TouchableOpacity>
