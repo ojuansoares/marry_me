@@ -21,7 +21,7 @@ function AppContent() {
 
     if (isAuthenticated && userType === 'fiance') {
         return (
-            <WeddingProvider>
+            <WeddingProvider >
                 {currentScreen === 'FianceHomeScreen' && (
                     <ProtectedFianceHome navigation={{ navigate: navigateTo }} />
                 )}

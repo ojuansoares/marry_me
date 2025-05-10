@@ -13,13 +13,3 @@ def define_routers(app: FastAPI) -> None:
     app.include_router(get_users_router())
     app.include_router(get_weddings_router())
     app.include_router(auth_router)
-
-def define_routers_api_router() -> APIRouter:
-    router = APIRouter()
-    
-    # Include routers
-    router.include_router(get_users_router())
-    router.include_router(get_weddings_router())
-    router.include_router(auth_router)
-    
-    return router

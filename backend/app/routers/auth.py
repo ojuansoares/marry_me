@@ -21,8 +21,7 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    # Busca o usuário pelo email
-    user = GetUserByEmailController.execute(db, u_email=form_data.username)
+    user = GetUserByEmailController(db, u_email=form_data.username).execute()
     if not user or not verify_password(form_data.password, user.u_password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

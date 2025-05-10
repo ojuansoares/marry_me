@@ -5,7 +5,6 @@ from app.core.database import Base, engine
 from app.models.models import (
     User,
     Wedding,
-    GuestGroup,
     Guest,
     Reminder,
     Image,

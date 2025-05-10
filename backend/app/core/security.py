@@ -70,7 +70,7 @@ async def get_current_user(
         raise credentials_exception
     return user
 
-def verify_user_type(token: str = Depends(oauth2_scheme), required_type: str = None) -> bool:
+def verify_user_type(token: str = Depends(oauth2_scheme), required_type: str | None = None) -> bool:
     """
     Verify if the user has the required type from the JWT token.
     

@@ -30,6 +30,8 @@ class Wedding(Base):
     id = Column(Integer, primary_key=True, index=True)
     w_fiance_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     w_date = Column(Date, nullable=False)
+    w_fiance_name = Column(String(100), nullable=False)
+    w_bride_name = Column(String(100), nullable=False)
     w_location = Column(String(255), nullable=False)
     w_description = Column(Text)
     w_status = Column(weddingstatus, default='active')
@@ -38,25 +40,9 @@ class Wedding(Base):
     # Relationships
     fiance = relationship("User", foreign_keys=[w_fiance_id], back_populates="weddings_fiance")
     guests = relationship("Guest", back_populates="wedding")
-    guest_groups = relationship("GuestGroup", back_populates="wedding")
     reminders = relationship("Reminder", back_populates="wedding")
     images = relationship("Image", back_populates="wedding")
     budgets = relationship("Budget", back_populates="wedding")
-
-class GuestGroup(Base):
-    __tablename__ = "guest_groups"
-
-    id = Column(Integer, primary_key=True, index=True)
-    gg_wedding_id = Column(Integer, ForeignKey("weddings.id", ondelete="CASCADE"))
-    gg_name = Column(String(100), nullable=False)
-    gg_responsible_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
-    gg_confirmed = Column(Boolean, default=False)
-    gg_created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-    # Relationships
-    wedding = relationship("Wedding", back_populates="guest_groups")
-    guests = relationship("Guest", back_populates="guest_group")
-    responsible = relationship("User")
 
 class Guest(Base):
     __tablename__ = "guests"
@@ -64,18 +50,19 @@ class Guest(Base):
     id = Column(Integer, primary_key=True, index=True)
     g_wedding_id = Column(Integer, ForeignKey("weddings.id", ondelete="CASCADE"))
     g_user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
-    g_group_id = Column(Integer, ForeignKey("guest_groups.id", ondelete="CASCADE"), nullable=True)
+    g_group_id = Column(Integer, nullable=True)
+    g_responsible_id = Column(Integer, ForeignKey("guests.id", ondelete="CASCADE"))
     g_name = Column(String(100), nullable=False)
     g_phone = Column(String(20))
-    g_email = Column(String(100))
-    g_qr_code = Column(String(255), unique=True)
-    g_confirmed = Column(Boolean, default=False)
+    g_qr_code = Column(String(255), unique=True, nullable=True)
+    g_confirmed = Column(Boolean, default=False, nullable=True)
     g_created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
     wedding = relationship("Wedding", back_populates="guests")
     user = relationship("User")
-    guest_group = relationship("GuestGroup", back_populates="guests")
+    responsible = relationship("Guest", remote_side=[id], back_populates="guests")
+    guests = relationship("Guest", back_populates="responsible", cascade="all, delete-orphan")
 
 class Reminder(Base):
     __tablename__ = "reminders"

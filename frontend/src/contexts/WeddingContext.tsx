@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import weddingService from '../services/weddingService';
+import weddingService, { WeddingCreate, WeddingUpdate } from '../services/weddingService';
 import { useAuth } from './AuthContext';
 import authService from '../services/authService';
 
@@ -7,14 +7,8 @@ interface WeddingContextType {
     wedding: any;
     fetchWedding: () => Promise<void>;
     createWedding: (weddingData: WeddingCreate) => Promise<any>;
+    updateWedding: (wedding_id: number, weddingData: WeddingUpdate) => Promise<void>;
     deleteWedding: () => Promise<void>;
-}
-
-export interface WeddingCreate {
-    w_date: string;
-    w_location: string;
-    w_description: string;
-    w_status: string;
 }
 
 const WeddingContext = createContext<WeddingContextType | undefined>(undefined);
@@ -49,10 +43,20 @@ export function WeddingProvider({ children }: { children: React.ReactNode }) {
             setWedding(response);
             console.log('Casamento criado com sucesso:', response);
         } catch (error) {
-            console.error('Erro ao criar casamento:', error);
+            console.error('Erro ao criar casamento: ', error);
             throw error;
         }
     };
+
+    const updateWedding = async (wedding_id: number, weddingData: WeddingUpdate) => {
+        try {
+            const response = await weddingService.updateWedding(wedding_id, weddingData);
+            setWedding(response);
+            console.log('Casamento atualizado com sucesso: ', response)
+        } catch (error) {
+            throw error;
+        }
+    }
 
     const deleteWedding = async () => {
         try {
@@ -66,7 +70,7 @@ export function WeddingProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <WeddingContext.Provider value={{ wedding, fetchWedding, createWedding, deleteWedding }}>
+        <WeddingContext.Provider value={{ wedding, fetchWedding, createWedding, updateWedding, deleteWedding }}>
             {children}
         </WeddingContext.Provider>
     );

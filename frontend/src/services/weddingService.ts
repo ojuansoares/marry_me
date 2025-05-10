@@ -10,6 +10,13 @@ export interface WeddingCreate {
     w_status: string;
 }
 
+export interface WeddingUpdate {
+    w_date?: string;
+    w_location?: string;
+    w_description?: string;
+    w_status?: string;
+}
+
 class WeddingService {
     async createWedding(weddingData: WeddingCreate): Promise<any> {
         try {
@@ -26,6 +33,7 @@ class WeddingService {
             return response.data;
         } catch (error) {
             console.error('Erro ao criar casamento:', error);
+            console.log(error)
             throw error;
         }
     }
@@ -43,6 +51,22 @@ class WeddingService {
             return response.data;
         } catch (error) {
             console.error('Erro ao buscar casamento:', error);
+            throw error;
+        }
+    }
+
+    async updateWedding(wedding_id: number, weddingData: WeddingUpdate) {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (!token) throw new Error('Usuário não autenticado');
+
+            const response = await axios.put(`${WEDDING_URL}/${wedding_id}`, weddingData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return response.data;
+        } catch (error) {
             throw error;
         }
     }

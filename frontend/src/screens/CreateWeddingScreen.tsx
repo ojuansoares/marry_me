@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { useWedding, WeddingCreate } from '../contexts/WeddingContext';
+import { useWedding } from '../contexts/WeddingContext';
+import { WeddingCreate, WeddingUpdate } from '../services/weddingService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 
@@ -42,6 +43,14 @@ export default function CreateWeddingScreen({ navigation }: { navigation: any })
     }
   };
 
+  const handleUpdateWedding = async () => {
+    try {
+        
+    } catch (error) {
+        console.error('Erro ao atualizar o casamento', error);
+    }
+  }
+ 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>

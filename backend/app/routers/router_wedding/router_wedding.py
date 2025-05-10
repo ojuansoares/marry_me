@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
 from app.schemas.wedding import Wedding, WeddingCreate, WeddingUpdate
-from app.models.models import Wedding as WeddingModel, User
+from app.schemas.user import GuestResponse
+from app.models.models import Wedding as WeddingModel, User, Guest as GuestUserModel
 from fastapi import HTTPException, status
+from typing import Any
 
 class CreateWeddingController:
     def __init__(self, session: Session, wedding: WeddingCreate, current_user: User):
@@ -30,6 +32,8 @@ class CreateWeddingController:
         self.db_wedding = WeddingModel(
             w_fiance_id = self.current_user.id,
             w_date=self.wedding.w_date,
+            w_fiance_name=self.wedding.w_fiance_name,
+            w_bride_name=self.wedding.w_bride_name,
             w_location=self.wedding.w_location,
             w_description=self.wedding.w_description,
             w_status=self.wedding.w_status
@@ -60,6 +64,37 @@ class GetWeddingByFianceController:
         if not self.db_wedding:
             raise HTTPException(status_code=404, detail="Wedding not found")
         return Wedding.from_orm(self.db_wedding)  
+
+
+class GetWeddingsByGuestController:
+    def __init__(self, session: Session, guest_id: int):
+        self.db = session
+        self.guest_id = guest_id
+        self.db_wedding: list[WeddingModel] | None = None
+
+    def execute(self) -> list[Wedding]:
+        confirmed_wedding_ids = (
+            self.db.query(GuestUserModel.g_wedding_id)
+            .filter(
+                GuestUserModel.g_user_id == self.guest_id,
+                GuestUserModel.g_confirmed == True
+            )
+            .all()
+        )
+        wedding_ids = [wedding_id[0] for wedding_id in confirmed_wedding_ids]
+        if not wedding_ids:
+            raise HTTPException(status_code=404, detail="No confirmed weddings found for this guest")
+
+        weddings = (
+            self.db.query(WeddingModel)
+            .filter(WeddingModel.id.in_(wedding_ids))
+            .all()
+        )
+
+        if not weddings:
+            raise HTTPException(status_code=404, detail="No weddings found")
+
+        return [Wedding.from_orm(wedding) for wedding in weddings]
 
 
 class UpdateWeddingController:
@@ -105,11 +140,6 @@ class DeleteWeddingController:
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Wedding not found"
                 )
-            if db_wedding.w_fiance_id != self.current_user.id:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="You are not allowed to delete this wedding"
-                )
             self.db.delete(db_wedding)
             self.db.commit()
         except Exception as e:
@@ -118,3 +148,22 @@ class DeleteWeddingController:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e)
             )
+
+class GetWeddingGuests:
+    def __init__(self, session: Session, fiance_id: int):
+        self._db = session
+        self._fiance_id = fiance_id
+
+    def execute(self) -> list[GuestResponse]:
+        try:
+            wedding = self._db.query(WeddingModel).filter(WeddingModel.w_fiance_id == self._fiance_id).first()
+            if not wedding:
+                raise HTTPException(status_code=404, detail="Wedding not found")
+            
+            guests = self._db.query(GuestUserModel).filter(GuestUserModel.g_wedding_id == wedding.id).all()
+            if not guests:
+                raise HTTPException(status_code=404, detail="Guests not found")
+            
+            return [GuestResponse.from_orm(guest) for guest in guests]
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))

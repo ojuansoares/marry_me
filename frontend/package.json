@@ -15,8 +15,11 @@
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
     "axios": "^1.6.7",
+    "date-fns": "^4.1.0",
     "expo": "^52.0.44",
+    "expo-asset": "^11.0.5",
     "expo-status-bar": "~2.0.1",
+    "frontend-new": "file:",
     "react": "18.3.1",
     "react-native": "0.76.9",
     "react-native-collapsible": "^1.6.2",
@@ -28,6 +31,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/date-fns": "^2.6.3",
+    "@types/prop-types": "^15.7.14",
     "@types/react": "~18.3.12",
     "@types/react-native": "^0.73.0",
     "typescript": "^5.1.3"
