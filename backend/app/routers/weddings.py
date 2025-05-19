@@ -12,8 +12,6 @@ from app.routers.router_wedding.router_wedding import (
     GetWeddingController,
     UpdateWeddingController,
     DeleteWeddingController,
-    GetWeddingsByGuestController,
-    GetWeddingGuests,
 )
 from app.schemas.user import GuestResponse
 from typing import Any
@@ -35,15 +33,6 @@ def create_wedding(
 ):
     return CreateWeddingController(session=session, wedding=wedding, current_user=current_user).execute()
 
-@router.get("/wedding_guests", response_model=list[GuestResponse])
-def get_wedding_guests(
-    session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-    _: bool = Depends(require_user_type("fiance"))
-):
-    current_user_id = current_user.id if isinstance(current_user.id, int) else current_user.id.value
-    return GetWeddingGuests(session=session, fiance_id=current_user_id).execute()
-
 @router.get("/{wedding_id}", response_model=Wedding)
 def get_wedding(
     wedding_id: int,
@@ -61,16 +50,6 @@ def get_wedding_by_fiance(
     _: bool = Depends(require_user_type("fiance"))
 ):
     return GetWeddingByFianceController(session=session, fiance_id=fiance_id).execute()
-
-@router.get("/guest", response_model=list[Wedding])
-def get_wedding_by_guest(
-    guest_id: int,
-    session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-    _: bool = Depends(require_user_type("guest"))
-):
-    guest_id = current_user.id if isinstance(current_user.id, int) else current_user.id.value
-    return GetWeddingsByGuestController(session, guest_id).execute()
 
 @router.put("/{wedding_id}", response_model=Wedding)
 def update_wedding(

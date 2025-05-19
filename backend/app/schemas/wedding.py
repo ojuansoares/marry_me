@@ -32,12 +32,3 @@ class WeddingUpdate(BaseModel):
     w_location: str | None = None
     w_description: str | None = None
     w_status: Literal['active', 'postponed', 'cancelled'] | None = None
-
-class Invite(BaseModel):
-    w_id: int
-    w_date: datetime
-    w_fiance_name: str
-    w_bride_name: str
-    w_location: str
-    w_description: str
-    g_id: int

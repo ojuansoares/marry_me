@@ -66,37 +66,6 @@ class GetWeddingByFianceController:
         return Wedding.from_orm(self.db_wedding)  
 
 
-class GetWeddingsByGuestController:
-    def __init__(self, session: Session, guest_id: int):
-        self.db = session
-        self.guest_id = guest_id
-        self.db_wedding: list[WeddingModel] | None = None
-
-    def execute(self) -> list[Wedding]:
-        confirmed_wedding_ids = (
-            self.db.query(GuestUserModel.g_wedding_id)
-            .filter(
-                GuestUserModel.g_user_id == self.guest_id,
-                GuestUserModel.g_confirmed == True
-            )
-            .all()
-        )
-        wedding_ids = [wedding_id[0] for wedding_id in confirmed_wedding_ids]
-        if not wedding_ids:
-            raise HTTPException(status_code=404, detail="No confirmed weddings found for this guest")
-
-        weddings = (
-            self.db.query(WeddingModel)
-            .filter(WeddingModel.id.in_(wedding_ids))
-            .all()
-        )
-
-        if not weddings:
-            raise HTTPException(status_code=404, detail="No weddings found")
-
-        return [Wedding.from_orm(wedding) for wedding in weddings]
-
-
 class UpdateWeddingController:
     def __init__(self, session: Session, wedding_id: int, wedding: WeddingUpdate):
         self.db = session
@@ -148,22 +117,3 @@ class DeleteWeddingController:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e)
             )
-
-class GetWeddingGuests:
-    def __init__(self, session: Session, fiance_id: int):
-        self._db = session
-        self._fiance_id = fiance_id
-
-    def execute(self) -> list[GuestResponse]:
-        try:
-            wedding = self._db.query(WeddingModel).filter(WeddingModel.w_fiance_id == self._fiance_id).first()
-            if not wedding:
-                raise HTTPException(status_code=404, detail="Wedding not found")
-            
-            guests = self._db.query(GuestUserModel).filter(GuestUserModel.g_wedding_id == wedding.id).all()
-            if not guests:
-                raise HTTPException(status_code=404, detail="Guests not found")
-            
-            return [GuestResponse.from_orm(guest) for guest in guests]
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))

@@ -52,19 +52,6 @@ class UserInDB(UserInDBBase):
     class Config:
         from_attributes = True
 
-class CreateWeddingGuest(BaseModel):
-    g_group_id: int
-    g_responsible_id: int | None = None
-    g_name: str
-    g_phone: str
-
-    @field_validator('g_group_id')
-    def validate_g_group_id(cls, g_group_id):
-        valid_group_ids = {group["id"] for group in Group.ALL_GROUPS}
-        if g_group_id not in valid_group_ids:
-            raise ValueError(f"Invalid group ID. Must be one of {valid_group_ids}")
-        return g_group_id
-
 class GuestResponse(BaseModel):
     id: int
     g_wedding_id: int

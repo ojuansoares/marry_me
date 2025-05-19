@@ -47,7 +47,7 @@ cp .env.example .env
 
 4. Configure o banco de dados PostgreSQL:
 
-- Crie um banco de dados chamado 'casamento'
+- Crie um banco de dados chamado 'marry_me'
 - As tabelas serão criadas automaticamente ao iniciar a aplicação
 
 5. Inicie o servidor:

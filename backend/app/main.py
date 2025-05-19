@@ -25,7 +25,6 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -34,37 +33,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize database connection and tables
 @app.on_event("startup")
 def startup_event():
     print("Initializing database connection...")
-    
-    # Set search path
-    with engine.connect() as conn:
+
+    # Executa comandos SQL que precisam de AUTOCOMMIT (como DO $$)
+    with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
         conn.execute(text("SET search_path TO public"))
-        
-        # Execute init.sql if it exists
-        init_sql_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'init.sql')
-        if os.path.exists(init_sql_path):
-            with open(init_sql_path, 'r') as f:
-                init_sql = f.read()
 
-            commands = [cmd.strip() for cmd in init_sql.split(';') if cmd.strip()]
-            for command in commands:
-                if command:
-                    try:
-                        conn.execute(text(command))
-                    except Exception as e:
-                        print(f"Error executing command: {str(e)}")
-            
-            conn.commit()
+        # Criação segura dos ENUMs se ainda não existirem
+        conn.execute(text("""
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'usertype') THEN
+                CREATE TYPE public.usertype AS ENUM ('fiance', 'guest');
+            END IF;
 
-    # Drop all tables and recreate them
-    Base.metadata.drop_all(bind=engine)
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'weddingstatus') THEN
+                CREATE TYPE public.weddingstatus AS ENUM ('active', 'postponed', 'cancelled');
+            END IF;
+
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'phototype') THEN
+                CREATE TYPE public.phototype AS ENUM ('couple', 'guests');
+            END IF;
+        END;
+        $$;
+        """))
+
+    # Só agora criamos as tabelas (depois dos ENUMs existirem!)
     Base.metadata.create_all(bind=engine)
     print("Database initialized successfully!")
 
-# Include routers
 define_routers(app)
 
 @app.get("/")
